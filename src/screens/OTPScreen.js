@@ -3,7 +3,7 @@ import { View, StyleSheet, Text } from 'react-native';
 import { Button, Badge, Input } from 'react-native-elements';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
-import firebase from '../config/firebaseConfig';
+import firebase from '../config/firebase-config';
 
 export const OTPScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -32,7 +32,7 @@ export const OTPScreen = ({ navigation }) => {
         code
       );
       await firebase.auth().signInWithCredential(credential);
-      navigation.navigate('Dashboard');
+      navigation.navigate('Registration');
     } catch (error) {
       setVerificationError(true);
     }
