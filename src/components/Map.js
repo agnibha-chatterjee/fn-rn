@@ -1,30 +1,57 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Dimensions } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import {
+  StyleSheet,
+  View,
+  Alert,
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { Context as UserContext } from '../contexts/user-context';
 
 export const Map = ({ navigation }) => {
-  const [latLng, setLatLng] = useState({
-    latitude: 12.9716,
-    longitude: 77.5946,
-  });
-  const [region, setRegion] = useState({
-    latitude: 12.9716,
-    longitude: 77.5946,
-    latitudeDelta: 0.04,
-    longitudeDelta: 0.05,
-  });
+  const { state, updateLocationAndAddress } = useContext(UserContext);
+  const [region, setRegion] = useState(null);
+
+  const fetchLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setRegion({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          latitudeDelta: 0.04,
+          longitudeDelta: 0.05,
+        });
+      },
+      (error) => Alert.alert(error.message),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+    );
+  };
+
+  useEffect(() => {
+    fetchLocation();
+  }, []);
+
+  if (!region) {
+    return (
+      <View>
+        <ActivityIndicator />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <MapView
-        region={region}
-        onRegionChange={setRegion}
-        style={styles.mapStyle}>
+      <MapView initialRegion={region} style={styles.mapStyle}>
         <Marker
           draggable
-          coordinate={latLng}
-          onDragEnd={(e) => setLatLng(e.nativeEvent.coordinate)}
-        />
+          coordinate={{
+            latitude: region.latitude,
+            longitude: region.longitude,
+          }}
+          onDragEnd={(e) => {
+            updateLocationAndAddress('Demo address', e.nativeEvent.coordinate);
+          }}></Marker>
       </MapView>
     </View>
   );

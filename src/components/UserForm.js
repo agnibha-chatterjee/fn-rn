@@ -1,9 +1,9 @@
-import React from 'react';
-import { MapView } from 'expo';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Button, Input, Slider } from 'react-native-elements';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { Context as UserContext } from '../contexts/user-context';
 
 const schema = Yup.object({
   firstName: Yup.string().required('Firstname is required'),
@@ -12,12 +12,14 @@ const schema = Yup.object({
     .min(6, 'Username has to have atleast 6')
     .required('Username is required'),
   email: Yup.string()
-    .email('Has to be a valid email')
+    .email('Enter a valid email id')
     .required('Email is required'),
   address: Yup.string().required('Address is required'),
 });
 
-export const RegistrationForm = ({ navigation }) => {
+export const UserForm = ({ navigation }) => {
+  const { state, registerUser } = useContext(UserContext);
+  console.log(state);
   return (
     <Formik
       initialValues={{
@@ -25,11 +27,12 @@ export const RegistrationForm = ({ navigation }) => {
         lastName: '',
         username: '',
         email: '',
-        address: '',
+        address: state.address ?? '',
         defaultSearchRadius: 0,
       }}
-      onSubmit={(values) => console.log(values)}
+      onSubmit={(values) => registerUser(values)}
       validateOnChange
+      enableReinitialize
       validationSchema={schema}>
       {({
         handleChange,
