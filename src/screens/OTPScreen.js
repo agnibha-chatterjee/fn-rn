@@ -1,11 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { Button, Badge, Input } from 'react-native-elements';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import firebase from '../config/firebase-config';
+import { Context as UserContext } from '../contexts/user-context';
 
 export const OTPScreen = ({ navigation }) => {
+  const { OTPSignin } = useContext(UserContext);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [verificationId, setVerificationId] = useState(null);
   const [verificationError, setVerificationError] = useState(false);
@@ -31,8 +33,11 @@ export const OTPScreen = ({ navigation }) => {
         verificationId,
         code
       );
-      await firebase.auth().signInWithCredential(credential);
-      navigation.navigate('Registration');
+      const userData = await firebase.auth().signInWithCredential(credential);
+      OTPSignin(
+        { uid: userData.user.uid, phoneNumber: userData.user.phoneNumber },
+        () => navigation.navigate('Registration')
+      );
     } catch (error) {
       setVerificationError(true);
     }

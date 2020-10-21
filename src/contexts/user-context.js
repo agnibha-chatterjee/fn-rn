@@ -6,11 +6,21 @@ import {
   REGISTER_USER,
   SIGNOUT,
 } from './types';
+import firebase from '../config/firebase-config';
 
 const reducer = (state, action) => {
   switch (action.type) {
+    case CHECK_AUTH_STATE:
+      return action.payload ? { ...state, authenticated: true } : state;
+    case OTP_SIGNIN:
+      return { ...state, authenticated: true, ...action.payload };
     case REGISTER_USER: {
-      return { ...state, ...action.payload };
+      return {
+        ...state,
+        ...action.payload,
+        authenticated: true,
+        registered: true,
+      };
     }
     case LOCATION_AND_ADDRESS_CHANGE:
       return {
@@ -21,26 +31,32 @@ const reducer = (state, action) => {
           longitude: action.payload.longitude,
         },
       };
+    case SIGNOUT:
+      return { ...state, authenticated: false };
     default:
       return state;
   }
 };
 
 //Auth
-const checkAuthState = (dispatch) => () => {
+const checkAuthState = (dispatch) => (user) => {
   dispatch({
     type: CHECK_AUTH_STATE,
+    payload: user,
   });
 };
 
-const OTPSignin = (dispatch) => (firebaseUserData) => {
+const OTPSignin = (dispatch) => (firebaseUserData, cb) => {
   dispatch({
     type: OTP_SIGNIN,
     payload: firebaseUserData,
   });
+  if (cb) cb();
 };
 
-const signOut = (dispatch) => () => {
+const signOut = (dispatch) => async () => {
+  console.log('hello');
+  await firebase.auth().signOut();
   dispatch({
     type: SIGNOUT,
   });
@@ -74,5 +90,5 @@ export const { Context, Provider } = createDataContext(
     signOut,
     checkAuthState,
   },
-  {}
+  { authenticated: true, registered: true }
 );

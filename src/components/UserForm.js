@@ -45,6 +45,19 @@ export const UserForm = ({ navigation }) => {
         <View style={styles.container}>
           <Input
             style={styles.input}
+            label='Address'
+            onFocus={() => {
+              navigation.navigate('Map');
+            }}
+            onChangeText={handleChange('address')}
+            onBlur={handleBlur('address')}
+            value={values.address}
+            errorMessage={
+              errors.address && touched.address ? errors.address : ''
+            }
+          />
+          <Input
+            style={styles.input}
             label='Firstname'
             onChangeText={handleChange('firstName')}
             onBlur={handleBlur('firstName')}
@@ -80,19 +93,6 @@ export const UserForm = ({ navigation }) => {
             onBlur={handleBlur('email')}
             value={values.email}
             errorMessage={errors.email && touched.email ? errors.email : ''}
-          />
-          <Input
-            style={styles.input}
-            label='Address'
-            onFocus={() => {
-              navigation.navigate('Map');
-            }}
-            onChangeText={handleChange('address')}
-            onBlur={handleBlur('address')}
-            value={values.address}
-            errorMessage={
-              errors.address && touched.address ? errors.address : ''
-            }
           />
           <Slider
             step={1}
