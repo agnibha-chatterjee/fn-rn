@@ -13,6 +13,7 @@ export const RootNavigationStack = () => {
       checkAuthState(user);
     });
   }, []);
+
   console.log(state);
   return (
     <ThemeProvider useDark={true}>

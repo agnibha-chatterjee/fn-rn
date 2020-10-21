@@ -7,12 +7,22 @@ import {
   SIGNOUT,
 } from './types';
 import firebase from '../config/firebase-config';
+import axios from '../config/axios';
 
 const reducer = (state, action) => {
   switch (action.type) {
     case CHECK_AUTH_STATE:
-      return action.payload ? { ...state, authenticated: true } : state;
+      return action.payload
+        ? {
+            ...state,
+            authenticated: true,
+            _id: action.payload.uid,
+            contactNumber: action.payload.phoneNumber,
+            registered: action.payload.registered,
+          }
+        : state;
     case OTP_SIGNIN:
+      console.log(action.payload);
       return { ...state, authenticated: true, ...action.payload };
     case REGISTER_USER: {
       return {
@@ -32,42 +42,69 @@ const reducer = (state, action) => {
         },
       };
     case SIGNOUT:
-      return { ...state, authenticated: false };
+      return { authenticated: false, registered: false };
     default:
       return state;
   }
 };
 
 //Auth
-const checkAuthState = (dispatch) => (user) => {
-  dispatch({
-    type: CHECK_AUTH_STATE,
-    payload: user,
-  });
+const checkAuthState = (dispatch) => async (user) => {
+  try {
+    let registered;
+    const res = await axios.get(`/users/${user.uid}`);
+    console.log('FROM CHECK AUTH', res);
+    if (res.data.username) {
+      registered = true;
+    }
+    dispatch({
+      type: CHECK_AUTH_STATE,
+      payload: { ...user, registered },
+    });
+  } catch (error) {}
 };
 
-const OTPSignin = (dispatch) => (firebaseUserData, cb) => {
-  dispatch({
-    type: OTP_SIGNIN,
-    payload: firebaseUserData,
-  });
-  if (cb) cb();
+const OTPSignin = (dispatch) => async (firebaseUserData, cb) => {
+  try {
+    const res = await axios.post('/users/login', { ...firebaseUserData });
+    console.log(res);
+    dispatch({
+      type: OTP_SIGNIN,
+      payload: {
+        ...firebaseUserData,
+        registered: res.data.user.username ? true : false,
+        isAlreadySignedIn: res.data.isAlreadySignedIn,
+      },
+    });
+    if (cb) cb();
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-const signOut = (dispatch) => async () => {
-  console.log('hello');
-  await firebase.auth().signOut();
-  dispatch({
-    type: SIGNOUT,
-  });
+const signOut = (dispatch) => async (_id) => {
+  try {
+    await firebase.auth().signOut();
+    await axios.post('/users/logout', { _id });
+    dispatch({
+      type: SIGNOUT,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 // Registration
-const registerUser = (dispatch) => (userData) => {
-  dispatch({
-    type: REGISTER_USER,
-    payload: userData,
-  });
+const registerUser = (dispatch) => async (userData) => {
+  try {
+    const res = await axios.post('/users/register', { ...userData });
+    dispatch({
+      type: REGISTER_USER,
+      payload: userData,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const updateLocationAndAddress = (dispatch) => (address, location) => {
@@ -90,5 +127,5 @@ export const { Context, Provider } = createDataContext(
     signOut,
     checkAuthState,
   },
-  { authenticated: true, registered: true }
+  { authenticated: false, registered: false }
 );
