@@ -1,5 +1,11 @@
 import { createDataContext } from './create-data-context';
-import { LOCATION_AND_ADDRESS_CHANGE, REGISTER_USER } from './types';
+import {
+  CHECK_AUTH_STATE,
+  LOCATION_AND_ADDRESS_CHANGE,
+  OTP_SIGNIN,
+  REGISTER_USER,
+  SIGNOUT,
+} from './types';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -20,6 +26,27 @@ const reducer = (state, action) => {
   }
 };
 
+//Auth
+const checkAuthState = (dispatch) => () => {
+  dispatch({
+    type: CHECK_AUTH_STATE,
+  });
+};
+
+const OTPSignin = (dispatch) => (firebaseUserData) => {
+  dispatch({
+    type: OTP_SIGNIN,
+    payload: firebaseUserData,
+  });
+};
+
+const signOut = (dispatch) => () => {
+  dispatch({
+    type: SIGNOUT,
+  });
+};
+
+// Registration
 const registerUser = (dispatch) => (userData) => {
   dispatch({
     type: REGISTER_USER,
@@ -40,6 +67,12 @@ const updateLocationAndAddress = (dispatch) => (address, location) => {
 
 export const { Context, Provider } = createDataContext(
   reducer,
-  { registerUser, updateLocationAndAddress },
+  {
+    registerUser,
+    updateLocationAndAddress,
+    OTPSignin,
+    signOut,
+    checkAuthState,
+  },
   {}
 );

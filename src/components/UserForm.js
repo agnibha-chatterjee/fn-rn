@@ -19,7 +19,6 @@ const schema = Yup.object({
 
 export const UserForm = ({ navigation }) => {
   const { state, registerUser } = useContext(UserContext);
-  console.log(state);
   return (
     <Formik
       initialValues={{
