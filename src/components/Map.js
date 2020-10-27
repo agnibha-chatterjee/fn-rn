@@ -1,16 +1,23 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import {
   StyleSheet,
   View,
   Alert,
-  Dimensions,
+  SafeAreaView,
   ActivityIndicator,
+  Image,
 } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { Button } from 'react-native-elements';
+import axios from 'axios';
+import MapView from 'react-native-maps';
 import { Context as UserContext } from '../contexts/user-context';
+import { generateGeocodeURI } from '../config/constants';
+import marker from '../../assets/marker_64.png';
 
-export const Map = ({ navigation }) => {
-  const { state, updateLocationAndAddress } = useContext(UserContext);
+export const Map = () => {
+  const { updateLocationAndAddress } = useContext(UserContext);
+  const navigation = useNavigation();
   const [region, setRegion] = useState(null);
 
   const fetchLocation = () => {
@@ -28,6 +35,15 @@ export const Map = ({ navigation }) => {
     );
   };
 
+  const saveLocation = async () => {
+    const res = await axios.get(
+      generateGeocodeURI(region.latitude, region.longitude)
+    );
+    updateLocationAndAddress(res.data.display_name, region, () =>
+      navigation.goBack()
+    );
+  };
+
   useEffect(() => {
     fetchLocation();
   }, []);
@@ -41,31 +57,46 @@ export const Map = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <MapView initialRegion={region} style={styles.mapStyle}>
-        <Marker
-          draggable
-          coordinate={{
-            latitude: region.latitude,
-            longitude: region.longitude,
-          }}
-          onDragEnd={(e) => {
-            updateLocationAndAddress('Demo address', e.nativeEvent.coordinate);
-          }}></Marker>
-      </MapView>
+    <View style={styles.map}>
+      <MapView
+        style={styles.map}
+        initialRegion={region}
+        onRegionChangeComplete={setRegion}
+      />
+      <View style={styles.markerFixed}>
+        <Image style={styles.marker} source={marker} />
+      </View>
+      <SafeAreaView style={styles.footer}>
+        <Button title='Confirm' raised onPress={saveLocation} />
+      </SafeAreaView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  map: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  mapStyle: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+  markerFixed: {
+    left: '50%',
+    marginLeft: -24,
+    marginTop: -48,
+    position: 'absolute',
+    top: '50%',
+  },
+  marker: {
+    height: 48,
+    width: 48,
+  },
+  footer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    bottom: 0,
+    position: 'absolute',
+    width: '100%',
+  },
+  region: {
+    color: '#fff',
+    lineHeight: 20,
+    margin: 20,
   },
 });

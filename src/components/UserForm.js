@@ -1,9 +1,11 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Button, Input, Slider } from 'react-native-elements';
+import { Button, Input, Slider, Divider } from 'react-native-elements';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Context as UserContext } from '../contexts/user-context';
+import { ProfilePhoto } from './ProfilePhoto';
 
 const schema = Yup.object({
   firstName: Yup.string().required('Firstname is required'),
@@ -17,20 +19,35 @@ const schema = Yup.object({
   address: Yup.string().required('Address is required'),
 });
 
-export const UserForm = ({ navigation }) => {
-  const { state, registerUser } = useContext(UserContext);
+export const UserForm = ({ buttonTitle }) => {
+  const { state, registerUser, updateProfile } = useContext(UserContext);
+  const navigation = useNavigation();
+  const route = useRoute();
+
   return (
     <ScrollView>
       <Formik
         initialValues={{
-          firstName: '',
-          lastName: '',
-          username: '',
-          email: '',
+          firstName: state.firstName ?? '',
+          lastName: state.lastName ?? '',
+          username: state.username ?? '',
+          email: state.email ?? '',
           address: state.address ?? '',
-          defaultSearchRadius: 0,
+          defaultSearchRadius: state.defaultSearchRadius ?? 0,
+          profilePicture: state.profilePicture ?? '',
         }}
-        onSubmit={(values) => registerUser({ ...values, _id: state._id })}
+        onSubmit={(values) => {
+          const userData = {
+            ...values,
+            _id: state._id,
+            defaultLocation: state.defaultLocation,
+          };
+          if (route.name === 'Registration') {
+            registerUser(userData);
+          } else {
+            updateProfile(userData);
+          }
+        }}
         validateOnChange
         enableReinitialize
         validationSchema={schema}>
@@ -44,6 +61,15 @@ export const UserForm = ({ navigation }) => {
           setFieldValue,
         }) => (
           <View style={styles.container}>
+            {route.name === 'Edit Profile' ? (
+              <ProfilePhoto
+                setFieldValue={setFieldValue}
+                profilePicture={values.profilePicture}
+                firstName={state.firstName}
+                lastName={state.lastName}
+              />
+            ) : null}
+            <Divider style={styles.divider} />
             <Input
               style={styles.input}
               label='Address'
@@ -83,6 +109,7 @@ export const UserForm = ({ navigation }) => {
               onChangeText={handleChange('username')}
               onBlur={handleBlur('username')}
               value={values.username}
+              autoCapitalize='none'
               errorMessage={
                 errors.username && touched.username ? errors.username : ''
               }
@@ -93,9 +120,12 @@ export const UserForm = ({ navigation }) => {
               onChangeText={handleChange('email')}
               onBlur={handleBlur('email')}
               value={values.email}
+              autoCapitalize='none'
               errorMessage={errors.email && touched.email ? errors.email : ''}
             />
+            <Text style={styles.label}>Your preferred search radius</Text>
             <Slider
+              style={styles.slider}
               step={1}
               minimumValue={1}
               maximumValue={20}
@@ -105,10 +135,12 @@ export const UserForm = ({ navigation }) => {
               value={values.defaultSearchRadius}
               thumbStyle={styles.thumb}
             />
-            <Text>{values.defaultSearchRadius} km(s)</Text>
+            <Text style={{ ...styles.label, marginTop: -5, marginBottom: 10 }}>
+              {values.defaultSearchRadius} km(s)
+            </Text>
             <Button
               onPress={handleSubmit}
-              title='Register'
+              title={buttonTitle}
               buttonStyle={styles.button}
             />
           </View>
@@ -132,5 +164,15 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 15,
+  },
+  label: {
+    marginLeft: 10,
+    marginBottom: -5,
+  },
+  slider: {
+    marginHorizontal: 10,
+  },
+  divider: {
+    marginBottom: 10,
   },
 });

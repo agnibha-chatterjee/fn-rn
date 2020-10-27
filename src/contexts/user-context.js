@@ -3,8 +3,10 @@ import {
   CHECK_AUTH_STATE,
   LOCATION_AND_ADDRESS_CHANGE,
   OTP_SIGNIN,
+  OTP_SIGNIN_ERROR,
   REGISTER_USER,
   SIGNOUT,
+  UPDATE_USER_PROFILE,
 } from './types';
 import firebase from '../config/firebase-config';
 import axios from '../config/axios';
@@ -22,8 +24,15 @@ const reducer = (state, action) => {
           }
         : state;
     case OTP_SIGNIN:
-      console.log(action.payload);
       return { ...state, authenticated: true, ...action.payload };
+    case OTP_SIGNIN_ERROR:
+      return {
+        ...state,
+        errors: {
+          ...state.errors,
+          duplicate_number: 'Phone number is already in use',
+        },
+      };
     case REGISTER_USER: {
       return {
         ...state,
@@ -32,6 +41,8 @@ const reducer = (state, action) => {
         registered: true,
       };
     }
+    case UPDATE_USER_PROFILE:
+      return { ...state, ...action.payload };
     case LOCATION_AND_ADDRESS_CHANGE:
       return {
         ...state,
@@ -53,13 +64,12 @@ const checkAuthState = (dispatch) => async (user) => {
   try {
     let registered;
     const res = await axios.get(`/users/${user.uid}`);
-    console.log('FROM CHECK AUTH', res);
     if (res.data.username) {
       registered = true;
     }
     dispatch({
       type: CHECK_AUTH_STATE,
-      payload: { ...user, registered },
+      payload: { ...user, registered, ...res.data },
     });
   } catch (error) {}
 };
@@ -67,18 +77,20 @@ const checkAuthState = (dispatch) => async (user) => {
 const OTPSignin = (dispatch) => async (firebaseUserData, cb) => {
   try {
     const res = await axios.post('/users/login', { ...firebaseUserData });
-    console.log(res);
     dispatch({
       type: OTP_SIGNIN,
       payload: {
         ...firebaseUserData,
         registered: res.data.user.username ? true : false,
         isAlreadySignedIn: res.data.isAlreadySignedIn,
+        ...res.data.user,
       },
     });
     if (cb) cb();
   } catch (error) {
-    console.log(error);
+    dispatch({
+      type: OTP_SIGNIN_ERROR,
+    });
   }
 };
 
@@ -98,6 +110,7 @@ const signOut = (dispatch) => async (_id) => {
 const registerUser = (dispatch) => async (userData) => {
   try {
     const res = await axios.post('/users/register', { ...userData });
+    console.log(userData);
     dispatch({
       type: REGISTER_USER,
       payload: userData,
@@ -107,7 +120,7 @@ const registerUser = (dispatch) => async (userData) => {
   }
 };
 
-const updateLocationAndAddress = (dispatch) => (address, location) => {
+const updateLocationAndAddress = (dispatch) => (address, location, cb) => {
   dispatch({
     type: LOCATION_AND_ADDRESS_CHANGE,
     payload: {
@@ -116,6 +129,22 @@ const updateLocationAndAddress = (dispatch) => (address, location) => {
       address,
     },
   });
+  if (cb) cb();
+};
+
+const updateProfile = (dispatch) => async (userData) => {
+  try {
+    const res = await axios(`/users/${userData._id}`, {
+      method: 'put',
+      headers: {
+        _id: userData._id,
+      },
+      data: { ...userData, image: userData.profilePicture },
+    });
+    dispatch({ type: UPDATE_USER_PROFILE, payload: userData });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const { Context, Provider } = createDataContext(
@@ -126,6 +155,28 @@ export const { Context, Provider } = createDataContext(
     OTPSignin,
     signOut,
     checkAuthState,
+    updateProfile,
   },
-  { authenticated: false, registered: false }
+  {
+    __v: 0,
+    _id: '6qiIuA67WAbAI9oixoNX91Ic9Ci1',
+    address: 'Demo address',
+    authenticated: true,
+    contactNumber: '+919901199218',
+    defaultLocation: {
+      latitude: 22.495492132177628,
+      longitude: 88.36303006857634,
+    },
+    defaultSearchRadius: 10,
+    email: 'aa@aa.com',
+    errors: {},
+    firstName: 'Agnibha',
+    isAlreadySignedIn: false,
+    lastModified: '',
+    lastName: 'Chatterjee',
+    profilePicture: '',
+    registered: true,
+    username: 'ac_abcd',
+    uuid: '6947f9bf-f455-4ecf-b847-f469e932f3e2',
+  }
 );

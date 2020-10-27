@@ -68,7 +68,7 @@ export const OTPScreen = ({ navigation }) => {
             placeholder='Ex: 9901199218'
             keyboardType='phone-pad'
             autoCompleteType='tel'
-            onChangeText={(value) => setPhoneNumber(value)}
+            onChangeText={setPhoneNumber}
           />
         </View>
         <Button title='Send OTP' onPress={requestOTP} raised />
@@ -84,11 +84,14 @@ export const OTPScreen = ({ navigation }) => {
             autoFocusOnLoad
             editable={true}
             keyboardAppearance='dark'
-            onCodeFilled={(code) => {
-              confirmOTP(code);
-            }}
+            onCodeFilled={confirmOTP}
           />
-          {verificationError ? <Text>Error! Please try again!</Text> : null}
+          {verificationError ? (
+            <Text style={styles.error}>Error! Please try again!</Text>
+          ) : null}
+          {state.errors.duplicate_number ? (
+            <Text style={styles.error}>{state.errors.duplicate_number}</Text>
+          ) : null}
         </View>
       ) : null}
     </>
@@ -148,5 +151,9 @@ const styles = StyleSheet.create({
 
   underlineStyleHighLighted: {
     borderColor: '#03DAC6',
+  },
+  error: {
+    color: 'red',
+    fontSize: 20,
   },
 });

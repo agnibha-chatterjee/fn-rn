@@ -1,13 +1,11 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { CustomHeader as Header } from '../components/Header';
-import { UserForm } from '../components/UserForm';
 
-export const EditProfileScreen = () => {
+export const DiscoverScreen = () => {
   return (
     <>
-      <Header title='Edit Profile' />
-      <UserForm buttonTitle='Save' />
+      <Header title='Request' />
     </>
   );
 };
