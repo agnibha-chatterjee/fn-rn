@@ -89,9 +89,6 @@ export const OTPScreen = ({ navigation }) => {
           {verificationError ? (
             <Text style={styles.error}>Error! Please try again!</Text>
           ) : null}
-          {state.errors.duplicate_number ? (
-            <Text style={styles.error}>{state.errors.duplicate_number}</Text>
-          ) : null}
         </View>
       ) : null}
     </>

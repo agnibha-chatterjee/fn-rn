@@ -5,6 +5,7 @@ import { CustomRightComponent } from './HeaderRightComponent';
 export const CustomHeader = ({ title, leftComponent }) => {
   return (
     <Header
+      backgroundColor='#222'
       centerComponent={{ text: title, style: { color: '#fff' } }}
       rightComponent={<CustomRightComponent />}
       leftComponent={leftComponent}

@@ -43,7 +43,7 @@ export const ProfilePhoto = ({
         titleStyle={styles.avatarTitle}
         rounded
         title={avatarTitle}
-        source={{ uri: profilePicture }}
+        source={profilePicture ? { uri: profilePicture } : null}
         size='xlarge'
         onPress={handleProfilePhoto}
       />
