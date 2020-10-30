@@ -15,7 +15,7 @@ export const RootNavigationStack = () => {
   }, []);
   console.log(state);
   return (
-    <ThemeProvider useDark={true}>
+    <ThemeProvider>
       <NavigationContainer>
         {state.authenticated && state.registered ? (
           <LoggedInRoutes />

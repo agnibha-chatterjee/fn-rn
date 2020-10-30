@@ -71,7 +71,11 @@ export const Map = () => {
         showsUserLocation>
         <Circle
           center={{ latitude: region.latitude, longitude: region.longitude }}
-          radius={defaultSearchRadius * MULTIPLY_FACTOR}
+          radius={
+            defaultSearchRadius
+              ? defaultSearchRadius * MULTIPLY_FACTOR
+              : MULTIPLY_FACTOR
+          }
           strokeWidth={1}
           strokeColor='#1a66ff'
           fillColor={'rgba(230,238,255,0.5)'}

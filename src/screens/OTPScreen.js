@@ -1,11 +1,12 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { Alert, View, StyleSheet, Text } from 'react-native';
 import { Button, Badge, Input } from 'react-native-elements';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import { Context as UserContext } from '../contexts/user-context';
 import firebase from '../config/firebase-config';
 import Constants from 'expo-constants';
+import { isValidNumber } from 'libphonenumber-js';
 
 export const OTPScreen = ({ navigation }) => {
   const { state, OTPSignin } = useContext(UserContext);
@@ -22,6 +23,12 @@ export const OTPScreen = ({ navigation }) => {
     try {
       const phoneProvider = new firebase.auth.PhoneAuthProvider();
       const phnNo = '+91'.concat(phoneNumber);
+      const isValidNo = isValidNumber(phnNo);
+      if (!isValidNo) {
+        return Alert.alert(
+          'That looks like an invalid phone number. Try again!'
+        );
+      }
       const verificationId = await phoneProvider.verifyPhoneNumber(
         phnNo,
         recaptchaVerifier.current
@@ -78,11 +85,9 @@ export const OTPScreen = ({ navigation }) => {
           <Text style={styles.verifyOtp}>Verify OTP</Text>
           <OTPInputView
             style={styles.otpInput}
-            codeInputFieldStyle={styles.underlineStyleBase}
-            codeInputHighlightStyle={styles.underlineStyleHighLighted}
             pinCount={6}
             autoFocusOnLoad
-            editable={true}
+            editable
             keyboardAppearance='dark'
             onCodeFilled={confirmOTP}
           />
@@ -136,17 +141,6 @@ const styles = StyleSheet.create({
     height: 45,
   },
   borderStyleHighLighted: {
-    borderColor: '#03DAC6',
-  },
-
-  underlineStyleBase: {
-    width: 30,
-    height: 45,
-    borderWidth: 0,
-    borderBottomWidth: 1,
-  },
-
-  underlineStyleHighLighted: {
     borderColor: '#03DAC6',
   },
   error: {

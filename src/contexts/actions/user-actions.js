@@ -30,7 +30,9 @@ export const checkAuthState = (dispatch) => async (user) => {
 
 export const OTPSignin = (dispatch) => async (firebaseUserData, cb) => {
   try {
+    console.log(firebaseUserData);
     const res = await axios.post('/users/login', { ...firebaseUserData });
+    console.log(res);
     dispatch({
       type: OTP_SIGNIN,
       payload: {
