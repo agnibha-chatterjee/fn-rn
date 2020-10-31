@@ -8,6 +8,7 @@ import {
   UPDATE_USER_PROFILE,
   SEARCH_RADIUS_CHANGE,
   SIGNOUT_ERROR,
+  CUSTOM_REQUEST_LOCATION,
 } from './types';
 import firebase from '../../config/firebase-config';
 import axios from '../../config/axios';
@@ -30,9 +31,7 @@ export const checkAuthState = (dispatch) => async (user) => {
 
 export const OTPSignin = (dispatch) => async (firebaseUserData, cb) => {
   try {
-    console.log(firebaseUserData);
     const res = await axios.post('/users/login', { ...firebaseUserData });
-    console.log(res);
     dispatch({
       type: OTP_SIGNIN,
       payload: {
@@ -72,30 +71,42 @@ export const signOut = (dispatch) => async (_id) => {
 export const registerUser = (dispatch) => async (userData) => {
   try {
     const res = await axios.post('/users/register', { ...userData });
-    console.log(userData);
     dispatch({
       type: REGISTER_USER,
       payload: userData,
     });
   } catch (error) {
-    console.log(error);
+    Alert.alert('Problem registering. Try again!');
   }
 };
 
 export const updateLocationAndAddress = (dispatch) => (
+  type,
   address,
   location,
   cb
 ) => {
-  dispatch({
-    type: LOCATION_AND_ADDRESS_CHANGE,
-    payload: {
-      latitude: location.latitude,
-      longitude: location.longitude,
-      address,
-    },
-  });
-  if (cb) cb();
+  if (type === 'default') {
+    dispatch({
+      type: LOCATION_AND_ADDRESS_CHANGE,
+      payload: {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        address,
+      },
+    });
+    if (cb) cb();
+  } else {
+    dispatch({
+      type: CUSTOM_REQUEST_LOCATION,
+      payload: {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        address,
+      },
+    });
+    if (cb) cb();
+  }
 };
 
 export const updateSearchRadius = (dispatch) => (searchRadius) => {
@@ -116,6 +127,6 @@ export const updateProfile = (dispatch) => async (userData) => {
     });
     dispatch({ type: UPDATE_USER_PROFILE, payload: userData });
   } catch (error) {
-    console.log(error);
+    Alert.alert('Error updating profile. Try again!');
   }
 };

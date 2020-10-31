@@ -1,11 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Alert, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { ListItem, Avatar } from 'react-native-elements';
 import { RefreshView } from '../components/RefreshView';
 import axios from '../config/axios';
 import { Context as UserContext } from '../contexts/user-context';
 
 export const HistoryScreen = () => {
+  const navigation = useNavigation();
   const {
     state: { _id },
   } = useContext(UserContext);
@@ -43,7 +45,9 @@ export const HistoryScreen = () => {
       request: { title, requestType, completed },
     } = item;
     return (
-      <ListItem bottomDivider>
+      <ListItem
+        bottomDivider
+        onPress={() => navigation.navigate('HistoryItem', { ...item.request })}>
         <Avatar
           rounded
           icon={
@@ -68,12 +72,12 @@ export const HistoryScreen = () => {
   return (
     <RefreshView
       reqSent={reqSent}
-      headerTitle='History'
       onRefresh={onRefresh}
       refreshing={refreshing}
       data={history}
       renderListItem={renderListItem}
       listKeyExtractor={listKeyExtractor}
+      emptyText="Looks like you've made no requests so far"
     />
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useNavigationState } from '@react-navigation/native';
 import {
   StyleSheet,
   View,
@@ -17,6 +17,7 @@ import { generateGeocodeURI, MULTIPLY_FACTOR } from '../config/constants';
 import marker from '../../assets/marker_64.png';
 
 export const Map = () => {
+  const navigationState = useNavigationState((state) => state);
   const {
     state: { defaultSearchRadius },
     updateLocationAndAddress,
@@ -36,7 +37,7 @@ export const Map = () => {
         });
       },
       (error) => Alert.alert(error.message),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 1000 }
     );
   };
 
@@ -44,7 +45,15 @@ export const Map = () => {
     const res = await axios.get(
       generateGeocodeURI(region.latitude, region.longitude)
     );
-    updateLocationAndAddress(res.data.display_name, region, () =>
+    if (navigationState.routeNames.find((name) => name === 'Request')) {
+      return updateLocationAndAddress(
+        'custom',
+        res.data.display_name,
+        region,
+        () => navigation.goBack()
+      );
+    }
+    updateLocationAndAddress('default', res.data.display_name, region, () =>
       navigation.goBack()
     );
   };
@@ -55,7 +64,7 @@ export const Map = () => {
 
   if (!region) {
     return (
-      <View>
+      <View style={styles.map}>
         <ActivityIndicator />
       </View>
     );

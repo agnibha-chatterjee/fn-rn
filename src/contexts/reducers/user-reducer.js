@@ -8,6 +8,7 @@ import {
   SIGNOUT,
   SIGNOUT_ERROR,
   UPDATE_USER_PROFILE,
+  CUSTOM_REQUEST_LOCATION,
 } from '../actions/types';
 
 export const userReducer = (state, action) => {
@@ -51,6 +52,16 @@ export const userReducer = (state, action) => {
           longitude: action.payload.longitude,
         },
       };
+    case CUSTOM_REQUEST_LOCATION:
+      return {
+        ...state,
+        customAddress: action.payload.address,
+        customLocation: {
+          latitude: action.payload.latitude,
+          longitude: action.payload.longitude,
+        },
+      };
+
     case SEARCH_RADIUS_CHANGE:
       return {
         ...state,

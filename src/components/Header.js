@@ -1,13 +1,12 @@
 import React from 'react';
 import { Header } from 'react-native-elements';
-import { CustomRightComponent } from './HeaderRightComponent';
 
-export const CustomHeader = ({ title, leftComponent }) => {
+export const CustomHeader = ({ title, leftComponent, rightComponent }) => {
   return (
     <Header
       backgroundColor='#222'
       centerComponent={{ text: title, style: { color: '#fff' } }}
-      rightComponent={<CustomRightComponent />}
+      rightComponent={rightComponent}
       leftComponent={leftComponent}
     />
   );
@@ -15,4 +14,5 @@ export const CustomHeader = ({ title, leftComponent }) => {
 
 CustomHeader.defaultProps = {
   leftComponent: null,
+  rightComponent: null,
 };

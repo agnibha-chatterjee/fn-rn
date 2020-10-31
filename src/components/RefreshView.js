@@ -6,21 +6,19 @@ import {
   ActivityIndicator,
   Text,
 } from 'react-native';
-import { CustomHeader as Header } from './Header';
 
 export const RefreshView = ({
-  headerTitle,
   onRefresh,
   refreshing,
   data,
   renderListItem,
   listKeyExtractor,
   reqSent,
+  emptyText,
 }) => {
   if (reqSent && data.length > 0) {
     return (
       <>
-        <Header title={headerTitle} />
         <FlatList
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -34,18 +32,22 @@ export const RefreshView = ({
   } else if (reqSent && !data.length) {
     return (
       <>
-        <Header title={headerTitle} />
-        <Text>You have made no requests</Text>
+        <Text>{emptyText}</Text>
       </>
     );
   } else {
     return (
       <>
-        <Header title={headerTitle} />
         <ActivityIndicator size='large' color='#222' />
       </>
     );
   }
+};
+
+RefreshView.defaultProps = {
+  data: [],
+  emptyText: '',
+  headerTitle: '',
 };
 
 const styles = StyleSheet.create({});

@@ -4,46 +4,127 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { DashboardScreen } from '../screens/DashboardScreen';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { HistoryScreen } from '../screens/HistoryScreen';
+import { HistoryItemScreen } from '../screens/HistoryItemScreen';
 import { EditProfileScreen } from '../screens/EditProfileScreen';
 import { DiscoverScreen } from '../screens/DiscoverScreen';
 import { MapScreen } from '../screens/MapScreen';
 import { RequestScreen } from '../screens/RequestScreen';
+import { CustomHeader as Header } from '../components/Header';
+import {
+  CustomLeftComponentDashboard,
+  CommonLeftComponent,
+} from '../components/HeaderLeftComponent';
+import { CustomRightComponent } from '../components/HeaderRightComponent';
 
 const Tab = createBottomTabNavigator();
 const EditProfileStack = createStackNavigator();
 const HistoryStack = createStackNavigator();
 const DashboardStack = createStackNavigator();
+const DiscoverStack = createStackNavigator();
 
 const EditProfileStackScreen = () => {
   return (
-    <EditProfileStack.Navigator>
+    <EditProfileStack.Navigator
+      screenOptions={{
+        header: () => (
+          <Header title='Edit Profile' rightComponent={CustomRightComponent} />
+        ),
+      }}>
       <EditProfileStack.Screen
         name='Edit Profile'
         component={EditProfileScreen}
-        options={{ header: () => null }}
       />
       <EditProfileStack.Screen
         name='Map'
-        options={{ headerTitle: 'Choose your location' }}
+        options={{
+          header: () => (
+            <Header
+              title='Choose your location'
+              leftComponent={CommonLeftComponent}
+            />
+          ),
+        }}
         component={MapScreen}
       />
     </EditProfileStack.Navigator>
   );
 };
 
+const DiscoverStackScreen = () => {
+  return (
+    <DiscoverStack.Navigator
+      screenOptions={{
+        header: () => (
+          <Header title='Discover' rightComponent={CustomRightComponent} />
+        ),
+      }}>
+      <DiscoverStack.Screen name='Discover' component={DiscoverScreen} />
+    </DiscoverStack.Navigator>
+  );
+};
+
 const HistoryStackScreen = () => {
   return (
-    <HistoryStack.Navigator headerMode='none'>
+    <HistoryStack.Navigator
+      screenOptions={{
+        header: () => (
+          <Header title='History' rightComponent={CustomRightComponent} />
+        ),
+      }}>
       <HistoryStack.Screen name='History' component={HistoryScreen} />
+      <HistoryStack.Screen
+        name='HistoryItem'
+        options={({ route }) => ({
+          header: () => (
+            <Header
+              title={route.params.title}
+              leftComponent={CommonLeftComponent}
+            />
+          ),
+        })}
+        component={HistoryItemScreen}
+      />
     </HistoryStack.Navigator>
   );
 };
 
 const DashboardStackScreen = () => {
   return (
-    <DashboardStack.Navigator headerMode='none'>
+    <DashboardStack.Navigator
+      screenOptions={{
+        header: () => (
+          <Header
+            title='Dashboard'
+            leftComponent={CustomLeftComponentDashboard}
+            rightComponent={CustomRightComponent}
+          />
+        ),
+      }}>
       <DashboardStack.Screen name='Dashboard' component={DashboardScreen} />
-      <DashboardStack.Screen name='Request' component={RequestScreen} />
+      <DashboardStack.Screen
+        options={{
+          header: () => (
+            <Header
+              title='New Request/Offering'
+              leftComponent={CommonLeftComponent}
+            />
+          ),
+        }}
+        name='Request'
+        component={RequestScreen}
+      />
+      <DashboardStack.Screen
+        name='Map'
+        options={{
+          header: () => (
+            <Header
+              title='Choose your location'
+              leftComponent={CommonLeftComponent}
+            />
+          ),
+        }}
+        component={MapScreen}
+      />
     </DashboardStack.Navigator>
   );
 };
@@ -64,11 +145,12 @@ export const LoggedInRoutes = () => {
     <Tab.Navigator>
       <Tab.Screen
         name='Dashboard'
-        options={{
+        options={({ route }) => ({
+          tabBarVisible: getTabBarVisibility(route),
           tabBarIcon: () => (
             <MaterialIcons name='dashboard' size={24} color='black' />
           ),
-        }}
+        })}
         component={DashboardStackScreen}
       />
       <Tab.Screen
@@ -78,7 +160,7 @@ export const LoggedInRoutes = () => {
             <FontAwesome5 name='globe' size={24} color='black' />
           ),
         }}
-        component={DiscoverScreen}
+        component={DiscoverStackScreen}
       />
       <Tab.Screen
         options={{

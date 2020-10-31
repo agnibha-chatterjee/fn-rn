@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { StyleSheet, ScrollView, View, Text, Switch } from 'react-native';
-import { Input, Divider, Button } from 'react-native-elements';
+import { Input, Divider, Button, ButtonGroup } from 'react-native-elements';
 import RNPickerSelect from 'react-native-picker-select';
+import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { Context as UserContext } from '../contexts/user-context';
@@ -19,7 +20,7 @@ const schema = Yup.object({
 });
 
 const typePickerItems = [
-  { label: 'Requesting', value: 'request', key: 2 },
+  { label: 'Request', value: 'request', key: 2 },
   { label: 'Offering', value: 'offering', key: 3 },
 ];
 
@@ -31,6 +32,21 @@ const locationPickerItems = [
 const ISO_END = 'T23:59:00.000Z';
 
 export const RequestForm = () => {
+  const navigation = useNavigation();
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  const DefaultButton = () => <Text>Default Location</Text>;
+  const CustomButton = () => {
+    return (
+      <Text
+        onPress={() => {
+          navigation.navigate('Map');
+          setSelectedIdx(1);
+        }}>
+        Custom Location
+      </Text>
+    );
+  };
+  const buttons = [{ element: DefaultButton }, { element: CustomButton }];
   const { state } = useContext(UserContext);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [toggle, setToggle] = useState(false);
@@ -44,15 +60,20 @@ export const RequestForm = () => {
           contactNumber: state.contactNumber ?? '',
           expiration: new Date(),
           price: '0',
-          locationPreference: 'default',
+          selectedIndex: selectedIdx,
         }}
-        onSubmit={(values) =>
-          console.log({
+        onSubmit={(values) => {
+          const finalValues = {
             ...values,
-            location: state.defaultLocation,
-            searchRadius: state.defaultLocation,
-          })
-        }
+            location:
+              values.selectedIndex === 0
+                ? state.defaultLocation
+                : state.customLocation,
+            searchRadius: state.defaultSearchRadius,
+            price: parseInt(values.price),
+          };
+          console.log(finalValues);
+        }}
         validateOnChange
         validationSchema={schema}>
         {({
@@ -154,14 +175,22 @@ export const RequestForm = () => {
               ) : null}
               <View style={styles.pickerContainer}>
                 <Text style={styles.label}>Select your preferred location</Text>
-                <RNPickerSelect
-                  style={styles.picker}
-                  onValueChange={handleChange('locationPreference')}
-                  items={locationPickerItems}
-                  onBlur={handleBlur('locationPreference')}
-                  value={values.locationPreference}
-                  placeholder={{}}
+                <ButtonGroup
+                  onPress={(idx) => {
+                    setFieldValue('selectedIndex', idx);
+                    if (idx === 1) {
+                      navigation.navigate('Map');
+                    }
+                  }}
+                  selectedIndex={values.selectedIndex}
+                  buttons={buttons}
+                  containerStyle={{ height: 40 }}
                 />
+                <Text style={styles.address}>
+                  {values.selectedIndex === 0
+                    ? `Default address : ${state.address}`
+                    : `Custom address : ${state.customAddress}`}
+                </Text>
                 <Divider />
               </View>
               <Button
@@ -202,5 +231,8 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 15,
+  },
+  address: {
+    margin: 10,
   },
 });
