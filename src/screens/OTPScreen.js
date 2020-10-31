@@ -1,18 +1,31 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
-import { Alert, View, StyleSheet, Text } from 'react-native';
-import { Button, Badge, Input } from 'react-native-elements';
+import {
+  Alert,
+  View,
+  StyleSheet,
+  ScrollView,
+  Text,
+  Image,
+  ImageBackground,
+  Dimensions,
+} from 'react-native';
+import { Button, Badge, Input, Overlay } from 'react-native-elements';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import { Context as UserContext } from '../contexts/user-context';
 import firebase from '../config/firebase-config';
 import Constants from 'expo-constants';
 import { isValidNumber } from 'libphonenumber-js';
+import login_fg from '../../assets/login_fg.png';
+import login_bg from '../../assets/login_bg.png';
 
 export const OTPScreen = ({ navigation }) => {
   const { state, OTPSignin } = useContext(UserContext);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [verificationId, setVerificationId] = useState(null);
   const [verificationError, setVerificationError] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [visible, setVisible] = useState(false);
   const recaptchaVerifier = useRef(null);
 
   useEffect(() => {
@@ -34,10 +47,13 @@ export const OTPScreen = ({ navigation }) => {
         recaptchaVerifier.current
       );
       setVerificationId(verificationId);
+      setVisible(true);
     } catch (err) {
-      console.log(err);
+      Alert.alert('Error fetching OTP. Try again!');
     }
   };
+
+  const toggleOverlay = () => setVisible((prevVisible) => !prevVisible);
 
   const confirmOTP = async (code) => {
     try {
@@ -61,48 +77,71 @@ export const OTPScreen = ({ navigation }) => {
   };
 
   return (
-    <>
-      <FirebaseRecaptchaVerifierModal
-        ref={recaptchaVerifier}
-        firebaseConfig={firebase.app().options}
-      />
-      <View style={styles.container}>
-        <Text style={styles.header}>Please enter your phone number</Text>
-        <View style={styles.parent}>
-          <Badge value='+91' badgeStyle={styles.badge} />
-          <Input
-            inputStyle={styles.input}
-            placeholder='Ex: 9901199218'
-            keyboardType='phone-pad'
-            autoCompleteType='tel'
-            onChangeText={setPhoneNumber}
-          />
+    <ImageBackground source={login_bg} style={styles.bgImage}>
+      <ScrollView>
+        <FirebaseRecaptchaVerifierModal
+          ref={recaptchaVerifier}
+          firebaseConfig={firebase.app().options}
+        />
+        <Image source={login_fg} style={styles.image} />
+        <View style={styles.container}>
+          <Text style={styles.header}>Please enter your phone number</Text>
+          <View style={styles.parent}>
+            <Badge value='+91' badgeStyle={styles.badge} />
+            <Input
+              inputStyle={styles.input}
+              placeholder='Ex: 9901199218'
+              keyboardType='phone-pad'
+              autoCompleteType='tel'
+              onChangeText={setPhoneNumber}
+            />
+          </View>
+          <Button title='Request OTP' onPress={requestOTP} raised />
         </View>
-        <Button title='Send OTP' onPress={requestOTP} raised />
-      </View>
-      {verificationId ? (
-        <View style={styles.parent2}>
-          <Text style={styles.verifyOtp}>Verify OTP</Text>
-          <OTPInputView
-            style={styles.otpInput}
-            pinCount={6}
-            autoFocusOnLoad
-            editable
-            keyboardAppearance='dark'
-            onCodeFilled={confirmOTP}
-          />
-          {verificationError ? (
-            <Text style={styles.error}>Error! Please try again!</Text>
-          ) : null}
-        </View>
-      ) : null}
-    </>
+        <Overlay isVisible={visible} onBackdropPress={toggleOverlay}>
+          {verificationId ? (
+            <View style={styles.parent2}>
+              <Text style={styles.verifyOtp}>Verify OTP</Text>
+              <OTPInputView
+                style={styles.otpInput}
+                pinCount={6}
+                autoFocusOnLoad
+                secureTextEntry
+                keyboardAppearance='dark'
+                code={otp}
+                onCodeChanged={setOtp}
+                onCodeFilled={confirmOTP}
+              />
+              {verificationError ? (
+                <>
+                  <Text style={styles.error}>
+                    Incorrect OTP. Please try again!
+                  </Text>
+                  <Button
+                    title='Clear OTP'
+                    buttonStyle={styles.clearOtp}
+                    onPress={() => {
+                      setVerificationError(null);
+                      setOtp('');
+                    }}
+                  />
+                </>
+              ) : null}
+            </View>
+          ) : (
+            <Text>Hello world</Text>
+          )}
+        </Overlay>
+      </ScrollView>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     margin: 15,
+    paddingTop: 35,
+    marginTop: 25,
   },
   parent: {
     flexDirection: 'row',
@@ -112,7 +151,6 @@ const styles = StyleSheet.create({
   parent2: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 100,
   },
   otpInput: {
     alignSelf: 'center',
@@ -127,7 +165,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 20,
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   input: {
     color: 'black',
@@ -146,5 +184,21 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     fontSize: 20,
+  },
+  image: {
+    marginVertical: 20,
+    height: 200,
+    width: 200,
+    alignSelf: 'center',
+  },
+  bgImage: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    height: Dimensions.get('window').height,
+    width: Dimensions.get('window').width,
+  },
+  clearOtp: {
+    marginVertical: 15,
   },
 });

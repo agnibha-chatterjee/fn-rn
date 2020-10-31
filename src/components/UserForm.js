@@ -62,14 +62,16 @@ export const UserForm = ({ buttonTitle }) => {
         }) => (
           <View style={styles.container}>
             {route.name === 'Edit Profile' ? (
-              <ProfilePhoto
-                setFieldValue={setFieldValue}
-                profilePicture={values.profilePicture}
-                firstName={state.firstName}
-                lastName={state.lastName}
-              />
+              <>
+                <ProfilePhoto
+                  setFieldValue={setFieldValue}
+                  profilePicture={values.profilePicture}
+                  firstName={state.firstName}
+                  lastName={state.lastName}
+                />
+                <Divider style={styles.divider} />
+              </>
             ) : null}
-            <Divider style={styles.divider} />
             <Input
               style={styles.input}
               label='Address'
