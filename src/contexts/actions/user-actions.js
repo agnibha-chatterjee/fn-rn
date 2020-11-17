@@ -36,7 +36,7 @@ export const checkAuthState = (dispatch) => async (user, cb) => {
 
 export const OTPSignin = (dispatch) => async (firebaseUserData, cb) => {
   try {
-    Alert.alert('Signing you in...');
+    Alert.alert("Hang on tight! We're signing you in.");
     const res = await axios.post('/users/login', { ...firebaseUserData });
     dispatch({
       type: OTP_SIGNIN,
@@ -60,7 +60,7 @@ export const OTPSignin = (dispatch) => async (firebaseUserData, cb) => {
 
 export const signOut = (dispatch) => async (_id) => {
   try {
-    Alert.alert('Signing you out...');
+    Alert.alert("Hold on! We're signing you out...");
     await firebase.auth().signOut();
     await axios.post('/users/logout', { _id });
     dispatch({
