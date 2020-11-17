@@ -21,6 +21,7 @@ export const userReducer = (state, action) => {
             _id: action.payload.uid,
             contactNumber: action.payload.phoneNumber,
             registered: action.payload.registered,
+            ...action.payload,
           }
         : state;
     case OTP_SIGNIN:
@@ -68,7 +69,7 @@ export const userReducer = (state, action) => {
         defaultSearchRadius: action.payload,
       };
     case SIGNOUT:
-      return { authenticated: false, registered: false };
+      return { authenticated: false, registered: false, errors: {} };
     case SIGNOUT_ERROR:
       return {
         ...state,

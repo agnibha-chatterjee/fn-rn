@@ -8,6 +8,7 @@ import {
   checkAuthState,
   updateProfile,
   updateSearchRadius,
+  newRequest,
 } from './actions/user-actions';
 
 export const { Context, Provider } = createDataContext(
@@ -20,10 +21,11 @@ export const { Context, Provider } = createDataContext(
     checkAuthState,
     updateProfile,
     updateSearchRadius,
+    newRequest,
   },
   {
+    authenticated: false,
     errors: {},
-    isAlreadySignedIn: false,
-    registered: true,
+    registered: false,
   }
 );

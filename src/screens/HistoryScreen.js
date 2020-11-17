@@ -25,13 +25,16 @@ export const HistoryScreen = () => {
       setHistory(res.data);
     } catch (error) {
       Alert.alert('Error fetching your history. Please try again!');
+      setReqSent(true);
     }
   };
 
   const onRefresh = () => {
     setRefreshing(true);
+    setReqSent(false);
     fetchUserHistory(_id);
     setRefreshing(false);
+    setReqSent(true);
   };
 
   useEffect(() => {

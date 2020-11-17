@@ -63,6 +63,7 @@ export const OTPScreen = ({ navigation }) => {
       );
       const uuid = Constants.deviceId;
       const userData = await firebase.auth().signInWithCredential(credential);
+      setVisible(false);
       OTPSignin(
         {
           _id: userData.user.uid,
@@ -78,7 +79,7 @@ export const OTPScreen = ({ navigation }) => {
 
   return (
     <ImageBackground source={login_bg} style={styles.bgImage}>
-      <ScrollView>
+      <>
         <FirebaseRecaptchaVerifierModal
           ref={recaptchaVerifier}
           firebaseConfig={firebase.app().options}
@@ -98,41 +99,42 @@ export const OTPScreen = ({ navigation }) => {
           </View>
           <Button title='Request OTP' onPress={requestOTP} raised />
         </View>
-        <Overlay isVisible={visible} onBackdropPress={toggleOverlay}>
-          {verificationId ? (
-            <View style={styles.parent2}>
-              <Text style={styles.verifyOtp}>Verify OTP</Text>
-              <OTPInputView
-                style={styles.otpInput}
-                pinCount={6}
-                autoFocusOnLoad
-                secureTextEntry
-                keyboardAppearance='dark'
-                code={otp}
-                onCodeChanged={setOtp}
-                onCodeFilled={confirmOTP}
-              />
-              {verificationError ? (
-                <>
-                  <Text style={styles.error}>
-                    Incorrect OTP. Please try again!
-                  </Text>
-                  <Button
-                    title='Clear OTP'
-                    buttonStyle={styles.clearOtp}
-                    onPress={() => {
-                      setVerificationError(null);
-                      setOtp('');
-                    }}
-                  />
-                </>
-              ) : null}
-            </View>
-          ) : (
-            <Text>Hello world</Text>
-          )}
-        </Overlay>
-      </ScrollView>
+        {verificationId ? (
+          <ScrollView>
+            <Overlay isVisible={visible} onBackdropPress={toggleOverlay}>
+              <View style={styles.parent2}>
+                <Text style={styles.verifyOtp}>Verify OTP</Text>
+                <OTPInputView
+                  style={styles.otpInput}
+                  pinCount={6}
+                  autoFocusOnLoad
+                  keyboardAppearance='dark'
+                  secureTextEntry
+                  keyboardType='number-pad'
+                  code={otp}
+                  onCodeChanged={setOtp}
+                  onCodeFilled={confirmOTP}
+                />
+                {verificationError ? (
+                  <>
+                    <Text style={styles.error}>
+                      Incorrect OTP. Please try again!
+                    </Text>
+                    <Button
+                      title='Clear OTP'
+                      buttonStyle={styles.clearOtp}
+                      onPress={() => {
+                        setVerificationError(null);
+                        setOtp('');
+                      }}
+                    />
+                  </>
+                ) : null}
+              </View>
+            </Overlay>
+          </ScrollView>
+        ) : null}
+      </>
     </ImageBackground>
   );
 };
@@ -141,7 +143,7 @@ const styles = StyleSheet.create({
   container: {
     margin: 15,
     paddingTop: 35,
-    marginTop: 25,
+    marginTop: 1,
   },
   parent: {
     flexDirection: 'row',
@@ -154,7 +156,7 @@ const styles = StyleSheet.create({
   },
   otpInput: {
     alignSelf: 'center',
-    width: '80%',
+    width: '85%',
     height: 100,
     color: 'black',
   },
@@ -186,7 +188,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   image: {
-    marginVertical: 20,
+    marginVertical: 40,
     height: 200,
     width: 200,
     alignSelf: 'center',

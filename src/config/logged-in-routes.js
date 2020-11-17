@@ -1,8 +1,9 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { DashboardScreen } from '../screens/DashboardScreen';
-import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { MaterialIcons, FontAwesome5, FontAwesome } from '@expo/vector-icons';
 import { HistoryScreen } from '../screens/HistoryScreen';
 import { HistoryItemScreen } from '../screens/HistoryItemScreen';
 import { EditProfileScreen } from '../screens/EditProfileScreen';
@@ -26,9 +27,7 @@ const EditProfileStackScreen = () => {
   return (
     <EditProfileStack.Navigator
       screenOptions={{
-        header: () => (
-          <Header title='Edit Profile' rightComponent={CustomRightComponent} />
-        ),
+        header: () => <Header title='Edit Profile' />,
       }}>
       <EditProfileStack.Screen
         name='Edit Profile'
@@ -54,9 +53,7 @@ const DiscoverStackScreen = () => {
   return (
     <DiscoverStack.Navigator
       screenOptions={{
-        header: () => (
-          <Header title='Discover' rightComponent={CustomRightComponent} />
-        ),
+        header: () => <Header title='Discover' />,
       }}>
       <DiscoverStack.Screen name='Discover' component={DiscoverScreen} />
     </DiscoverStack.Navigator>
@@ -67,9 +64,7 @@ const HistoryStackScreen = () => {
   return (
     <HistoryStack.Navigator
       screenOptions={{
-        header: () => (
-          <Header title='History' rightComponent={CustomRightComponent} />
-        ),
+        header: () => <Header title='History' />,
       }}>
       <HistoryStack.Screen name='History' component={HistoryScreen} />
       <HistoryStack.Screen
@@ -131,9 +126,7 @@ const DashboardStackScreen = () => {
 
 export const LoggedInRoutes = () => {
   const getTabBarVisibility = (route) => {
-    const routeName = route.state
-      ? route.state.routes[route.state.index].name
-      : '';
+    const routeName = getFocusedRouteNameFromRoute(route);
 
     if (routeName === 'Map') {
       return false;
@@ -175,10 +168,10 @@ export const LoggedInRoutes = () => {
         options={({ route }) => ({
           tabBarVisible: getTabBarVisibility(route),
           tabBarIcon: () => (
-            <MaterialIcons name='edit' size={24} color='black' />
+            <FontAwesome name='user-circle-o' size={24} color='black' />
           ),
         })}
-        name='Edit'
+        name='Profile'
         component={EditProfileStackScreen}
       />
     </Tab.Navigator>

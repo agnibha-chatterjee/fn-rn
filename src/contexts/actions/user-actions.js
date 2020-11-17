@@ -15,22 +15,28 @@ import axios from '../../config/axios';
 import { Alert } from 'react-native';
 
 //Auth
-export const checkAuthState = (dispatch) => async (user) => {
+export const checkAuthState = (dispatch) => async (user, cb) => {
   try {
-    let registered;
-    const res = await axios.get(`/users/${user.uid}`);
-    if (res.data.username) {
+    let registered = false;
+    const res = await axios.get(`/users/${user.uid}`, {
+      headers: {
+        _id: user.uid,
+      },
+    });
+    if (res.data.user.username) {
       registered = true;
     }
     dispatch({
       type: CHECK_AUTH_STATE,
-      payload: { ...user, registered, ...res.data },
+      payload: { registered, ...res.data.user },
     });
   } catch (error) {}
+  if (cb) cb();
 };
 
 export const OTPSignin = (dispatch) => async (firebaseUserData, cb) => {
   try {
+    Alert.alert('Signing you in...');
     const res = await axios.post('/users/login', { ...firebaseUserData });
     dispatch({
       type: OTP_SIGNIN,
@@ -54,6 +60,7 @@ export const OTPSignin = (dispatch) => async (firebaseUserData, cb) => {
 
 export const signOut = (dispatch) => async (_id) => {
   try {
+    Alert.alert('Signing you out...');
     await firebase.auth().signOut();
     await axios.post('/users/logout', { _id });
     dispatch({
@@ -70,11 +77,12 @@ export const signOut = (dispatch) => async (_id) => {
 // Registration
 export const registerUser = (dispatch) => async (userData) => {
   try {
-    const res = await axios.post('/users/register', { ...userData });
+    await axios.post('/users/register', { ...userData });
     dispatch({
       type: REGISTER_USER,
       payload: userData,
     });
+    Alert.alert('Welcome aboard!');
   } catch (error) {
     Alert.alert('Problem registering. Try again!');
   }
@@ -95,7 +103,6 @@ export const updateLocationAndAddress = (dispatch) => (
         address,
       },
     });
-    if (cb) cb();
   } else {
     dispatch({
       type: CUSTOM_REQUEST_LOCATION,
@@ -105,8 +112,8 @@ export const updateLocationAndAddress = (dispatch) => (
         address,
       },
     });
-    if (cb) cb();
   }
+  if (cb) cb();
 };
 
 export const updateSearchRadius = (dispatch) => (searchRadius) => {
@@ -129,4 +136,23 @@ export const updateProfile = (dispatch) => async (userData) => {
   } catch (error) {
     Alert.alert('Error updating profile. Try again!');
   }
+};
+
+export const newRequest = (dispatch) => async (requestData, cb) => {
+  try {
+    const reqData = new FormData();
+    reqData.append('data', JSON.stringify(requestData));
+    const res = await axios('/requests', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        _id: requestData._id,
+      },
+      data: reqData,
+    });
+    console.log(res.data);
+  } catch (error) {
+    console.log(error);
+  }
+  if (cb) cb();
 };

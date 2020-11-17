@@ -25,7 +25,7 @@ export const UserForm = ({ buttonTitle }) => {
   const route = useRoute();
 
   return (
-    <ScrollView>
+    <ScrollView keyboardShouldPersistTaps='always'>
       <Formik
         initialValues={{
           firstName: state.firstName ?? '',

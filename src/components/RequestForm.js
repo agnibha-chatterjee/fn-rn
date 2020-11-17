@@ -24,11 +24,6 @@ const typePickerItems = [
   { label: 'Offering', value: 'offering', key: 3 },
 ];
 
-const locationPickerItems = [
-  { label: 'Use default location', value: 'default', key: 0 },
-  { label: 'Select custom location', value: 'custom', key: 1 },
-];
-
 const ISO_END = 'T23:59:00.000Z';
 
 export const RequestForm = () => {
@@ -47,19 +42,19 @@ export const RequestForm = () => {
     );
   };
   const buttons = [{ element: DefaultButton }, { element: CustomButton }];
-  const { state } = useContext(UserContext);
+  const { state, newRequest } = useContext(UserContext);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [toggle, setToggle] = useState(false);
   return (
-    <ScrollView>
+    <ScrollView keyboardShouldPersistTaps='always'>
       <Formik
         initialValues={{
-          type: 'request',
+          requestType: 'request',
           title: '',
           description: '',
           contactNumber: state.contactNumber ?? '',
           expiration: new Date(),
-          price: '0',
+          cost: '0',
           selectedIndex: selectedIdx,
         }}
         onSubmit={(values) => {
@@ -70,9 +65,10 @@ export const RequestForm = () => {
                 ? state.defaultLocation
                 : state.customLocation,
             searchRadius: state.defaultSearchRadius,
-            price: parseInt(values.price),
+            requestedBy: state._id,
           };
-          console.log(finalValues);
+          delete finalValues['selectedIndex'];
+          newRequest(finalValues);
         }}
         validateOnChange
         validationSchema={schema}>
@@ -91,10 +87,10 @@ export const RequestForm = () => {
                 <Text style={styles.label}>Type of Request</Text>
                 <RNPickerSelect
                   style={styles.picker}
-                  onValueChange={handleChange('type')}
+                  onValueChange={handleChange('requestType')}
                   items={typePickerItems}
-                  onBlur={handleBlur('type')}
-                  value={values.type}
+                  onBlur={handleBlur('requestType')}
+                  value={values.requestType}
                   placeholder={{}}
                 />
                 <Divider />
@@ -164,9 +160,9 @@ export const RequestForm = () => {
                 <Input
                   style={styles.input}
                   label='Price'
-                  onChangeText={handleChange('price')}
-                  onBlur={handleBlur('price')}
-                  value={values.price}
+                  onChangeText={handleChange('cost')}
+                  onBlur={handleBlur('cost')}
+                  value={values.cost}
                   keyboardType='number-pad'
                   errorMessage={
                     errors.price && touched.price ? errors.price : ''
