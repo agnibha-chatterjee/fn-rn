@@ -99,6 +99,11 @@ export const UserForm = ({ buttonTitle }) => {
                 errors.firstName && touched.firstName ? errors.firstName : ''
               }
             />
+            {state.canChangeName ? null : (
+              <Text style={styles.error}>
+                You can change your firstname every 365 days
+              </Text>
+            )}
             <Input
               style={styles.input}
               label='Lastname'
@@ -112,6 +117,11 @@ export const UserForm = ({ buttonTitle }) => {
                 errors.lastName && touched.lastName ? errors.lastName : ''
               }
             />
+            {state.canChangeName ? null : (
+              <Text style={styles.error}>
+                You can change your lastname every 365 days
+              </Text>
+            )}
             <Input
               style={styles.input}
               label='Username'
@@ -183,5 +193,11 @@ const styles = StyleSheet.create({
   },
   divider: {
     marginBottom: 10,
+  },
+  error: {
+    color: 'firebrick',
+    fontSize: 12,
+    top: -20,
+    left: 10,
   },
 });
