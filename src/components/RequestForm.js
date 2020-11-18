@@ -57,7 +57,7 @@ export const RequestForm = () => {
           cost: '0',
           selectedIndex: selectedIdx,
         }}
-        onSubmit={(values) => {
+        onSubmit={(values, { resetForm }) => {
           const finalValues = {
             ...values,
             location:
@@ -66,9 +66,10 @@ export const RequestForm = () => {
                 : state.customLocation,
             searchRadius: state.defaultSearchRadius,
             requestedBy: state._id,
+            expiration: values.expiration.toISOString().split('T')[0] + ISO_END,
           };
           delete finalValues['selectedIndex'];
-          newRequest(finalValues);
+          newRequest(finalValues, () => resetForm());
         }}
         validateOnChange
         validationSchema={schema}>

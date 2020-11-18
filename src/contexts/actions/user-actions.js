@@ -28,7 +28,11 @@ export const checkAuthState = (dispatch) => async (user, cb) => {
     }
     dispatch({
       type: CHECK_AUTH_STATE,
-      payload: { registered, ...res.data.user },
+      payload: {
+        registered,
+        ...res.data.user,
+        canChangeName: res.data.canChangeName,
+      },
     });
   } catch (error) {}
   if (cb) cb();
@@ -130,9 +134,13 @@ export const updateProfile = (dispatch) => async (userData) => {
       headers: {
         _id: userData._id,
       },
-      data: { ...userData, image: userData.profilePicture },
+      data: userData,
     });
     dispatch({ type: UPDATE_USER_PROFILE, payload: userData });
+    if (res.data.error) {
+      return Alert.alert(res.data.error);
+    }
+    return Alert.alert('Successfully updated profile!');
   } catch (error) {
     Alert.alert('Error updating profile. Try again!');
   }
@@ -140,19 +148,18 @@ export const updateProfile = (dispatch) => async (userData) => {
 
 export const newRequest = (dispatch) => async (requestData, cb) => {
   try {
-    const reqData = new FormData();
-    reqData.append('data', JSON.stringify(requestData));
     const res = await axios('/requests', {
       method: 'post',
       headers: {
-        'Content-Type': 'multipart/form-data',
         _id: requestData._id,
       },
-      data: reqData,
+      data: requestData,
     });
-    console.log(res.data);
+    if (res.data.createdAt) {
+      Alert.alert('Request was successfully created!');
+    }
   } catch (error) {
-    console.log(error);
+    Alert.alert('Error! Please try again');
   }
   if (cb) cb();
 };

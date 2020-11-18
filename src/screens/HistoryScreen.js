@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Alert, StyleSheet } from 'react-native';
+import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ListItem, Avatar } from 'react-native-elements';
 import { RefreshView } from '../components/RefreshView';
@@ -84,5 +84,3 @@ export const HistoryScreen = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({});

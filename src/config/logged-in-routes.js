@@ -135,7 +135,7 @@ export const LoggedInRoutes = () => {
     return true;
   };
   return (
-    <Tab.Navigator>
+    <Tab.Navigator tabBarOptions={{ keyboardHidesTabBar: true }}>
       <Tab.Screen
         name='Dashboard'
         options={({ route }) => ({

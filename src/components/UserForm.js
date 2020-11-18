@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Keyboard } from 'react-native';
 import { Button, Input, Slider, Divider } from 'react-native-elements';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -76,6 +76,7 @@ export const UserForm = ({ buttonTitle }) => {
               style={styles.input}
               label='Address'
               onFocus={() => {
+                Keyboard.dismiss();
                 navigation.navigate('Map');
               }}
               onChangeText={handleChange('address')}
@@ -91,6 +92,9 @@ export const UserForm = ({ buttonTitle }) => {
               onChangeText={handleChange('firstName')}
               onBlur={handleBlur('firstName')}
               value={values.firstName}
+              disabled={
+                route.name === 'Edit Profile' ? !state.canChangeName : false
+              }
               errorMessage={
                 errors.firstName && touched.firstName ? errors.firstName : ''
               }
@@ -101,6 +105,9 @@ export const UserForm = ({ buttonTitle }) => {
               onChangeText={handleChange('lastName')}
               onBlur={handleBlur('lastName')}
               value={values.lastName}
+              disabled={
+                route.name === 'Edit Profile' ? !state.canChangeName : false
+              }
               errorMessage={
                 errors.lastName && touched.lastName ? errors.lastName : ''
               }
