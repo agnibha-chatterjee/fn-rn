@@ -31,15 +31,16 @@ export const HistoryScreen = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    setReqSent(false);
     fetchUserHistory(_id);
     setRefreshing(false);
-    setReqSent(true);
   };
 
   useEffect(() => {
-    fetchUserHistory(_id);
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchUserHistory(_id);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const listKeyExtractor = (item) => item.request._id;
 

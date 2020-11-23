@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Header } from 'react-native-elements';
 
 export const CustomHeader = ({ title, leftComponent, rightComponent }) => {
@@ -7,11 +7,12 @@ export const CustomHeader = ({ title, leftComponent, rightComponent }) => {
       backgroundColor='#222'
       centerComponent={{ text: title, style: { color: '#fff' } }}
       leftComponent={leftComponent}
-      // rightComponent={rightComponent}
+      rightComponent={rightComponent}
     />
   );
 };
 
 CustomHeader.defaultProps = {
   leftComponent: null,
+  rightComponent: null,
 };

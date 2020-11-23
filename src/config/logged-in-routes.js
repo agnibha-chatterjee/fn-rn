@@ -8,6 +8,7 @@ import { HistoryScreen } from '../screens/HistoryScreen';
 import { HistoryItemScreen } from '../screens/HistoryItemScreen';
 import { EditProfileScreen } from '../screens/EditProfileScreen';
 import { DiscoverScreen } from '../screens/DiscoverScreen';
+import { DiscoverItemScreen } from '../screens/DiscoverItemScreen';
 import { MapScreen } from '../screens/MapScreen';
 import { RequestScreen } from '../screens/RequestScreen';
 import { CustomHeader as Header } from '../components/Header';
@@ -27,7 +28,9 @@ const EditProfileStackScreen = () => {
   return (
     <EditProfileStack.Navigator
       screenOptions={{
-        header: () => <Header title='Edit Profile' />,
+        header: () => (
+          <Header title='Edit Profile' rightComponent={CustomRightComponent} />
+        ),
       }}>
       <EditProfileStack.Screen
         name='Edit Profile'
@@ -56,6 +59,18 @@ const DiscoverStackScreen = () => {
         header: () => <Header title='Discover' />,
       }}>
       <DiscoverStack.Screen name='Discover' component={DiscoverScreen} />
+      <DiscoverStack.Screen
+        name='DiscoverItem'
+        options={({ route }) => ({
+          header: () => (
+            <Header
+              title={route.params.title}
+              leftComponent={CommonLeftComponent}
+            />
+          ),
+        })}
+        component={DiscoverItemScreen}
+      />
     </DiscoverStack.Navigator>
   );
 };
@@ -91,7 +106,6 @@ const DashboardStackScreen = () => {
           <Header
             title='Dashboard'
             leftComponent={CustomLeftComponentDashboard}
-            rightComponent={CustomRightComponent}
           />
         ),
       }}>

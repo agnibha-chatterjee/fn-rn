@@ -99,7 +99,7 @@ export const UserForm = ({ buttonTitle }) => {
                 errors.firstName && touched.firstName ? errors.firstName : ''
               }
             />
-            {state.canChangeName ? null : (
+            {state.canChangeName && route.name === 'Edit Profile' ? null : (
               <Text style={styles.error}>
                 You can change your firstname every 365 days
               </Text>
@@ -117,7 +117,7 @@ export const UserForm = ({ buttonTitle }) => {
                 errors.lastName && touched.lastName ? errors.lastName : ''
               }
             />
-            {state.canChangeName ? null : (
+            {state.canChangeName && route.name === 'Edit Profile' ? null : (
               <Text style={styles.error}>
                 You can change your lastname every 365 days
               </Text>

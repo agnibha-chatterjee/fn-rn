@@ -10,7 +10,6 @@ export const ProfilePhoto = ({
   lastName,
 }) => {
   const avatarTitle = profilePicture ? '' : `${firstName[0]}${lastName[0]}`;
-
   useEffect(() => {
     (async () => {
       if (Platform.OS !== 'web') {

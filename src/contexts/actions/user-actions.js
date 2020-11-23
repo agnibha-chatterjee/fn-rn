@@ -146,7 +146,7 @@ export const updateProfile = (dispatch) => async (userData) => {
   }
 };
 
-export const newRequest = (dispatch) => async (requestData, cb) => {
+export const newRequest = () => async (requestData, cb) => {
   try {
     const res = await axios('/requests', {
       method: 'post',

@@ -31,19 +31,18 @@ export const DiscoverScreen = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    setReqSent(false);
     fetchNearbyRequests(_id);
     setRefreshing(false);
-    setReqSent(true);
   };
 
   useEffect(() => {
-    fetchNearbyRequests(_id);
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchNearbyRequests(_id);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const listKeyExtractor = (item) => item.request._id;
-
-  console.log(requests);
 
   const renderListItem = ({ item }) => {
     const {
@@ -52,7 +51,9 @@ export const DiscoverScreen = () => {
     return (
       <ListItem
         bottomDivider
-        onPress={() => navigation.navigate('HistoryItem', { ...item.request })}>
+        onPress={() =>
+          navigation.navigate('DiscoverItem', { ...item.request })
+        }>
         <Avatar
           rounded
           icon={

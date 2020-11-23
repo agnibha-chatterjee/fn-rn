@@ -15,7 +15,6 @@ export const RootNavigationStack = () => {
       checkAuthState(user, () => setLoading(false));
     });
   }, []);
-  console.log(state);
 
   if (loading) {
     return (
