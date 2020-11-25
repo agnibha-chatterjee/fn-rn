@@ -51,7 +51,11 @@ export const HistoryScreen = () => {
     return (
       <ListItem
         bottomDivider
-        onPress={() => navigation.navigate('HistoryItem', { ...item.request })}>
+        onPress={() =>
+          navigation.navigate('HistoryItem', {
+            ...item,
+          })
+        }>
         <Avatar
           rounded
           icon={

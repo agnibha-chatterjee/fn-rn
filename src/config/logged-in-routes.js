@@ -87,7 +87,7 @@ const HistoryStackScreen = () => {
         options={({ route }) => ({
           header: () => (
             <Header
-              title={route.params.title}
+              title={route.params.request.title}
               leftComponent={CommonLeftComponent}
             />
           ),

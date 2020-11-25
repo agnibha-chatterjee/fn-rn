@@ -42,12 +42,16 @@ export const OTPSignin = (dispatch) => async (firebaseUserData, cb) => {
   try {
     Alert.alert("Hang on tight! We're signing you in.");
     const res = await axios.post('/users/login', { ...firebaseUserData });
+    if (res.data.isAlreadySignedIn) {
+      return Alert.alert(
+        "Looks like you're already signed into the app. Sign out of any other devices in order to continue"
+      );
+    }
     dispatch({
       type: OTP_SIGNIN,
       payload: {
         ...firebaseUserData,
         registered: res.data.user.username ? true : false,
-        isAlreadySignedIn: res.data.isAlreadySignedIn,
         ...res.data.user,
       },
     });
