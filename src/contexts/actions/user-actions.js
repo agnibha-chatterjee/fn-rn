@@ -14,6 +14,17 @@ import firebase from '../../config/firebase-config';
 import axios from '../../config/axios';
 import { Alert } from 'react-native';
 
+const registerUserForNotifications = async (userId, token = 'ASDASDASD') => {
+  try {
+    await axios.post('/notifications/register', {
+      userId,
+      token,
+    });
+  } catch (error) {
+    console.log('Notification error', error);
+  }
+};
+
 //Auth
 export const checkAuthState = (dispatch) => async (user, cb) => {
   try {
@@ -36,6 +47,7 @@ export const checkAuthState = (dispatch) => async (user, cb) => {
     });
   } catch (error) {}
   if (cb) cb();
+  registerUserForNotifications(user.uid);
 };
 
 export const OTPSignin = (dispatch) => async (firebaseUserData, cb) => {
@@ -64,6 +76,7 @@ export const OTPSignin = (dispatch) => async (firebaseUserData, cb) => {
       'This phone number is already in use. Please try again with a different phone number'
     );
   }
+  registerUserForNotifications(user.uid);
 };
 
 export const signOut = (dispatch) => async (_id) => {

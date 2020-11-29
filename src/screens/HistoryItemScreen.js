@@ -1,21 +1,44 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Card from '../components/Card';
-import { StyleSheet, FlatList, Text as RNText } from 'react-native';
+import { StyleSheet, FlatList, Text as RNText, Alert } from 'react-native';
 import { Text, ListItem, Avatar, BottomSheet } from 'react-native-elements';
 import { useRoute } from '@react-navigation/native';
+import axios from '../config/axios';
+import { Context as UserContext } from '../contexts/user-context';
 
 export const HistoryItemScreen = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedId, setSelectedId] = useState('');
+  const { state } = useContext(UserContext);
   const details = useRoute().params;
   const { users, request } = details;
+
+  const acceptUser = async () => {
+    try {
+      const res = await axios.patch(
+        `/requests/${request._id}/respond/${selectedId}`,
+        {
+          headers: {
+            _id: state._id,
+          },
+        }
+      );
+      if (res.data.success) {
+        Alert.alert('Successful!');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('We ran into an error! Please try again.');
+    }
+    setIsVisible(false);
+  };
 
   const list = [
     {
       title: 'Accept',
       containerStyle: { backgroundColor: 'darkgreen' },
       titleStyle: { color: 'white' },
-      onPress: () => console.log('FROM INSIDE', selectedId),
+      onPress: acceptUser,
     },
     {
       title: 'Cancel',
@@ -35,11 +58,13 @@ export const HistoryItemScreen = () => {
         onPress={() => {
           setIsVisible(true);
           setSelectedId(_id);
-        }}>
+        }}
+        disabled={request.acceptedUser ? true : false}>
         <Avatar source={{ uri: profilePicture }} rounded size='medium' />
         <ListItem.Content>
           <ListItem.Title>{firstName}</ListItem.Title>
           <ListItem.Subtitle>{contactNumber}</ListItem.Subtitle>
+          {request.acceptedUser === _id ? <RNText>Accepted user</RNText> : null}
         </ListItem.Content>
         <ListItem.Chevron color='black' />
       </ListItem>
